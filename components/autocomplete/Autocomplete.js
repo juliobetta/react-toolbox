@@ -92,6 +92,10 @@ const factory = (Chip, Input) => {
      );
    };
 
+   handleMouseDown = (event) => {
+    this.selectOrCreateActiveItem(event);
+   }
+
    handleQueryBlur = () => {
      if (this.state.focus) this.setState({focus: false});
      if (this.props.onBlur) this.props.onBlur();
@@ -117,6 +121,10 @@ const factory = (Chip, Input) => {
      );
      if (shouldClearQuery) {
        this.setState({query: ''});
+     }
+
+     if (event.which === 13) {
+       this.selectOrCreateActiveItem(event);
      }
    };
 
@@ -166,6 +174,17 @@ const factory = (Chip, Input) => {
       }
       return query_value;
     }
+
+    selectOrCreateActiveItem (event) {
+      let target = this.state.active;
+      if (!target) {
+        target = this.props.allowCreate
+          ? this.state.query
+          : [...this.suggestions().keys()][0];
+        this.setState({active: target});
+      }
+      this.select(event, target);
+   }
 
    suggestions () {
      let suggest = new Map();
@@ -274,7 +293,7 @@ const factory = (Chip, Input) => {
            id={key}
            key={key}
            className={className}
-           onMouseDown={this.select}
+           onMouseDown={this.handleMouseDown}
            onMouseOver={this.handleSuggestionHover}
          >
            {value}
